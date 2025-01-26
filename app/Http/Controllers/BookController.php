@@ -12,12 +12,28 @@ class BookController extends Controller
      */
     public function index(Request $request)
     {
-        $books = Book::query()
-            ->when($request->has('title'), fn($query) => $query->title($request->title))
-            ->withAvg('reviews', 'rating')
-            ->withCount('reviews')
-            ->get();
+        // Retrieve the title and filter parameters
+        $title = $request->input('title'); // Get the value of 'title', or null if it doesn't exist.
+        $filter = $request->input('filter', ''); // Get the value of 'filter', default to an empty string.
 
+        // Build the query
+        $books = Book::query()
+            ->when($title, fn($query) => $query->title($title)); // Filter by title
+        // ->withAvg('reviews', 'rating') // Include average rating
+        // ->withCount('reviews'); // Include review count
+
+        $books = match ($filter) {
+            'popular_last_month' => $books->popularLastMonth(),
+            'popular_last_6months' => $books->popularLast6Months(),
+            'highest_rated_last_month' => $books->highestRatedLastMonth(),
+            'highest_rated_last_6months' => $books->highestRatedLast6Months(),
+            default => $books->latest(),
+        };
+
+        // Execute the query
+        $books = $books->get();
+
+        // Return the view with books data
         return view('books.index', ['books' => $books]);
     }
 
