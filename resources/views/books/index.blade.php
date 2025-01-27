@@ -40,10 +40,11 @@
 												</div>
 												<div>
 														<div class="book-rating">
-																{{ round($book->reviews_avg_rating, 1) ?? 'No ratings yet' }}
+																{{-- {{ $book->reviews_avg_rating ? round($book->reviews_avg_rating, 1) : 'No ratings yet' }} --}}
+																<x-star-rating :rating="$book->reviews_avg_rating" />
 														</div>
 														<div class="book-review-count">
-																out of {{ $book->reviews_count ?? 0 }} {{ Str::plural('review', $book->reviews_count) }}
+																{{ $book->reviews_count ?? 0 }} {{ Str::plural('review', $book->reviews_count) }}
 														</div>
 												</div>
 										</div>

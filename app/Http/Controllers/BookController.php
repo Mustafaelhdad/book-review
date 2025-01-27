@@ -19,9 +19,9 @@ class BookController extends Controller
 
         // Build the query
         $books = Book::query()
-            ->when($title, fn($query) => $query->title($title)); // Filter by title
-        // ->withAvg('reviews', 'rating') // Include average rating
-        // ->withCount('reviews'); // Include review count
+            ->when($title, fn($query) => $query->title($title)) // Filter by title
+            ->withAvg('reviews', 'rating') // Include average rating
+            ->withCount('reviews'); // Include review count
 
         $books = match ($filter) {
             'popular_last_month' => $books->popularLastMonth(),
@@ -32,14 +32,14 @@ class BookController extends Controller
         };
 
         // Execute the query
-        // $books = $books->get();
+        $books = $books->get();
 
-        $cacheKey = 'books:' . $filter . ':' . $title;
+        // $cacheKey = 'books:' . $filter . ':' . $title;
         // $books = cache()->remember($cacheKey, 3600, function () use ($books) {
         //     // dd('this is not from the cache');
         //     return $books->get();
         // });
-        $books = cache()->remember($cacheKey, 3600, fn() => $books->get());
+        // $books = cache()->remember($cacheKey, 3600, fn() => $books->get());
 
         // Return the view with books data
         return view('books.index', ['books' => $books]);
@@ -66,14 +66,17 @@ class BookController extends Controller
      */
     public function show(int $id)
     {
-        $bookCacheKey = 'book:' . $id;
+        // Retrieve the book with reviews, average rating, and reviews count
+        $book = Book::with([
+            'reviews' => fn($query) => $query->latest(), // Load reviews sorted by latest
+        ])->withAvgRating()
+            ->withReviewsCount()
+            ->findOrFail($id); // Fetch the book or fail if not found
 
-        $book = cache()->remember($bookCacheKey, 3600, fn() =>  Book::with([
-            'reviews' => fn($query) => $query->latest()
-        ]))->withAvgRating()->withReviewsCount()->findOrFail($id);
-
+        // Return the view with the book data
         return view('books.show', ['book' => $book]);
     }
+
 
     /**
      * Show the form for editing the specified resource.

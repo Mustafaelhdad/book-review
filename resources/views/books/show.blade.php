@@ -8,8 +8,8 @@
 						<div class="book-author mb-4 text-lg font-semibold">by {{ $book->author }}</div>
 						<div class="book-rating flex items-center">
 								<div class="mr-2 text-sm font-medium text-slate-700">
-										{{-- <x-star-rating :rating="$book->reviews_avg_rating" /> --}}
-										{{ round($book->reviews_avg_rating, 1) }}
+										<x-star-rating :rating="$book->reviews_avg_rating" />
+										{{-- {{ round($book->reviews_avg_rating, 1) }} --}}
 								</div>
 								<span class="book-review-count text-sm text-gray-500">
 										from {{ $book->reviews_count }} {{ Str::plural('review', $book->reviews_count) }}
@@ -32,8 +32,8 @@
 										<div>
 												<div class="mb-2 flex items-center justify-between">
 														<div class="font-semibold">
-																{{-- <x-star-rating :rating="$review->rating" /> --}}
-																{{ $review->rating }}
+																<x-star-rating :rating="$review->rating" />
+																{{-- {{ $review->rating }} --}}
 														</div>
 														<div class="book-review-count">
 																{{ $review->created_at->format('M j, Y') }}</div>
